@@ -1,0 +1,43 @@
+<?php
+
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\JobApplicationController;
+use App\Http\Controllers\JobController;
+use App\Http\Controllers\MyJobApplicationController;
+use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+Route::get('', fn() => to_route('jobs.index'));
+
+Route::resource('jobs', JobController::class)
+    ->only(['index', 'show']);
+
+Route::get('login', fn() => to_route('auth.create'))->name('login');
+Route::resource('auth', AuthController::class)
+    ->only(['create', 'store']);
+
+Route::delete('logout', fn() => to_route('auth.create'))->name('logout');
+Route::delete('auth', [AuthController::class, 'destroy'])
+    ->name('auth.destroy');
+
+
+Route::middleware('auth')->group(function() {
+    Route::resource('job.application', JobApplicationController::class)
+        ->only(['create', 'store']);
+
+    Route::resource('my-job-applications', MyJobApplicationController::class)
+        ->only(['index', 'destroy']);
+});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
