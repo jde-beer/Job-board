@@ -2,12 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Job;
+use App\Models\Employer;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
-use Illuminate\Auth\Access\Response;
 
-class JobPolicy
+class EmployerPolicy
 {
     use HandlesAuthorization;
 
@@ -17,25 +16,21 @@ class JobPolicy
      * @param  \App\Models\User  $user
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function viewAny(?User $user)
+    public function viewAny(User $user)
     {
-        return true;
+        return false;
     }
 
-    public function viewAnyEmployer(?User $user)
-    {
-        return true;
-    }
     /**
      * Determine whether the user can view the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Job  $job
+     * @param  \App\Models\Employer  $employer
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(?User $user, Job $job)
+    public function view(User $user, Employer $employer)
     {
-        return true;
+        return false;
     }
 
     /**
@@ -46,66 +41,54 @@ class JobPolicy
      */
     public function create(User $user)
     {
-        return $user->employer === null;
+        return null === $user->employer;
     }
 
     /**
      * Determine whether the user can update the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Job  $job
+     * @param  \App\Models\Employer  $employer
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(User $user, Job $job): bool|Response
+    public function update(User $user, Employer $employer)
     {
-        if ($job->employer->user_id !== $user->id) {
-            return false;
-        }
-
-        if ($job->jobApplications()->count() > 0) {
-            return Response::deny('Cannot change the job with applications');
-        }
-
-        return true;
+        return $employer->user_id === $user->id;
     }
 
     /**
      * Determine whether the user can delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Job  $job
+     * @param  \App\Models\Employer  $employer
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, Job $job): bool
+    public function delete(User $user, Employer $employer)
     {
-        return $job->employer->user_id === $user->id;
+        return false;
     }
 
     /**
      * Determine whether the user can restore the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Job  $job
+     * @param  \App\Models\Employer  $employer
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function restore(User $user, Job $job): bool
+    public function restore(User $user, Employer $employer)
     {
-        return $job->employer->user_id === $user->id;
+        return false;
     }
 
     /**
      * Determine whether the user can permanently delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Job  $job
+     * @param  \App\Models\Employer  $employer
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function forceDelete(User $user, Job $job)
+    public function forceDelete(User $user, Employer $employer)
     {
         return false;
-    }
-
-    public function apply(User $user, Job $job): bool {
-        return !$job->hasUserApplied($user);
     }
 }
